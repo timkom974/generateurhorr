@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HorrorStudio AI - Générateur de Scripts YouTube Horreur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        horror: ['Cinzel', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        blood: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                            950: '#450a0a',
+                        },
+                        abyss: {
+                            800: '#121318',
+                            900: '#0a0b0e',
+                            950: '#050507',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050507;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(153, 27, 27, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 85% 80%, rgba(127, 29, 29, 0.1) 0%, transparent 50%);
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(18, 19, 24, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .horror-border:hover {
+            border-color: rgba(220, 38, 38, 0.5);
+            box-shadow: 0 0 25px rgba(220, 38, 38, 0.15);
+        }
+        .pulse-blood {
+            animation: pulseBlood 2.5s infinite;
+        }
+        @keyframes pulseBlood {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0b0e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-blood-700 selection:text-white pb-20">
+
+    <!-- Top Navigation / Header -->
+    <header class="border-b border-zinc-800/80 bg-abyss-950/90 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blood-600 to-blood-950 flex items-center justify-center border border-blood-500/40 shadow-lg shadow-blood-900/30">
+                    <i class="fa-solid fa-skull text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-horror text-xl sm:text-2xl font-bold tracking-wider text-white flex items-center gap-2">
+                        NIGHTMARE <span class="text-blood-500 text-xs font-mono uppercase px-2 py-0.5 bg-blood-950/80 border border-blood-800 rounded">Studio 5s</span>
+                    </h1>
+                    <p class="text-xs text-zinc-400">Générateur de Scripts YouTube Horreur à Haute Rétention</p>
+                </div>
+            </div>
+
+            <!-- Stepper Indicator -->
+            <div class="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm font-medium">
+                <div id="step-ind-1" class="flex items-center space-x-2 text-blood-500">
+                    <span class="w-6 h-6 rounded-full bg-blood-600 text-white flex items-center justify-center text-xs font-bold">1</span>
+                    <span class="hidden md:inline">Configuration</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-zinc-700 text-xs"></i>
+                <div id="step-ind-2" class="flex items-center space-x-2 text-zinc-500">
+                    <span class="w-6 h-6 rounded-full bg-zinc-800 text-zinc-400 flex items-center justify-center text-xs font-bold">2</span>
+                    <span class="hidden md:inline">Synopsis (x3)</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-zinc-700 text-xs"></i>
+                <div id="step-ind-3" class="flex items-center space-x-2 text-zinc-500">
+                    <span class="w-6 h-6 rounded-full bg-zinc-800 text-zinc-400 flex items-center justify-center text-xs font-bold">3</span>
+                    <span class="hidden md:inline">Script 5s & Prompts</span>
+                </div>
+            </div>
+
+            <button onclick="resetApp()" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 px-3 py-2 rounded-lg transition flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right text-blood-500"></i>
+                <span class="hidden sm:inline">Nouvelle Histoire</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300">
+        <div class="bg-zinc-900 border-l-4 border-blood-500 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-blood-500"></i>
+            <span id="toast-message" class="text-sm font-medium">Action effectuée</span>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+
+        <!-- ==========================================
+             ÉTAPE 1 : CONFIGURATION INITIALE
+             ========================================== -->
+        <section id="section-step-1" class="max-w-3xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl border border-zinc-800/80">
+                <div class="flex items-center gap-3 mb-6">
+                    <i class="fa-solid fa-clapperboard text-blood-500 text-2xl"></i>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-white">Étape 1 : Paramètres de ta vidéo Horreur</h2>
+                        <p class="text-sm text-zinc-400">Entre le titre de ta vidéo et sélectionne la durée cible du script.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Titre de la vidéo -->
+                    <div>
+                        <label for="video-title" class="block text-sm font-semibold text-zinc-300 mb-2">
+                            Titre de la vidéo YouTube <span class="text-blood-500">*</span>
+                        </label>
+                        <input type="text" id="video-title" 
+                            placeholder="Ex: J'ai accepté le règlement étrange de cette station-service de nuit..." 
+                            class="w-full bg-abyss-900 border border-zinc-700 focus:border-blood-500 focus:ring-2 focus:ring-blood-500/20 rounded-xl px-4 py-3.5 text-white placeholder-zinc-500 transition outline-none text-base">
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            <span class="text-xs text-zinc-500">Exemples rapides :</span>
+                            <button type="button" onclick="fillSampleTitle('Ne répondez jamais quand quelqu’un frappe 4 fois à 3h12 du matin')" class="text-xs text-zinc-400 hover:text-blood-400 underline">3h12 du matin</button>
+                            <button type="button" onclick="fillSampleTitle('J’ai acheté un vieux garde-meuble abandonné, il y avait un journal intime dedans')" class="text-xs text-zinc-400 hover:text-blood-400 underline">Garde-meuble abandonné</button>
+                            <button type="button" onclick="fillSampleTitle('Le veilleur de nuit du camping m’a laissé une liste de 5 règles absurdes')" class="text-xs text-zinc-400 hover:text-blood-400 underline">5 règles absurdes</button>
+                        </div>
+                    </div>
+
+                    <!-- Menu déroulant durée -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="video-duration" class="block text-sm font-semibold text-zinc-300 mb-2">
+                                Durée du script <span class="text-blood-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <select id="video-duration" onchange="updateDurationMetrics()"
+                                    class="w-full appearance-none bg-abyss-900 border border-zinc-700 focus:border-blood-500 focus:ring-2 focus:ring-blood-500/20 rounded-xl px-4 py-3.5 text-white transition outline-none text-base cursor-pointer">
+                                    <option value="10">10 minutes (120 lignes de 5s)</option>
+                                    <option value="12">12 minutes (144 lignes de 5s)</option>
+                                    <option value="15" selected>15 minutes (180 lignes de 5s)</option>
+                                    <option value="17">17 minutes (204 lignes de 5s)</option>
+                                    <option value="20">20 minutes (240 lignes de 5s)</option>
+                                    <option value="25">25 minutes (300 lignes de 5s)</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <!-- Info Box Calcul Automatique -->
+                        <div class="bg-abyss-900/90 border border-zinc-800 rounded-xl p-3.5 flex flex-col justify-center">
+                            <div class="text-xs text-zinc-400 uppercase font-mono tracking-wider mb-1">Structure calibrée :</div>
+                            <div id="duration-metrics" class="text-sm text-zinc-200 font-medium">
+                                • <span class="text-blood-400 font-bold">180 blocs</span> de 5 secondes<br>
+                                • <span class="text-amber-400 font-bold">~60 pics</span> de suspense (10-15s)<br>
+                                • Dénouement final : <span class="text-emerald-400 font-bold">14:40 à 15:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rappel des règles intégrées -->
+                    <div class="bg-blood-950/20 border border-blood-900/50 rounded-xl p-4 text-xs sm:text-sm text-zinc-300 space-y-1.5">
+                        <div class="font-semibold text-blood-400 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> Formule Rétention Maximale activée :
+                        </div>
+                        <p>• Découpage strict ligne par ligne (<strong>max 5 secondes</strong> / ~12-15 mots par ligne) + <strong>Prompt Image</strong> sous chaque ligne.</p>
+                        <p>• <strong>Pics d'émotion et de suspense</strong> toutes les 10 à 15 secondes pour retenir l'auditeur.</p>
+                        <p>• <strong>Twist / Dénouement final</strong> concentré dans les <strong>20 dernières secondes</strong> (4 derniers blocs).</p>
+                        <p>• <strong>Hook d'introduction exceptionnel</strong> (3 x 5 secondes + prompts) généré à la fin pour placer au tout début de ta vidéo.</p>
+                    </div>
+
+                    <!-- Bouton Générer -->
+                    <button id="btn-generate-ideas" onclick="generateStoryIdeas()" 
+                        class="w-full bg-gradient-to-r from-blood-700 via-blood-600 to-blood-700 hover:from-blood-600 hover:to-blood-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-blood-900/40 transition transform active:scale-[0.99] flex items-center justify-center gap-3 text-base sm:text-lg pulse-blood">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Générer 3 idées d'histoires</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             ÉTAPE 2 : SÉLECTION DU SYNOPSIS (3 IDÉES)
+             ========================================== -->
+        <section id="section-step-2" class="hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-mono uppercase text-blood-400 mb-1">
+                        <span>Étape 2 sur 3</span>
+                        <span>•</span>
+                        <span id="step2-badge-duration">15 minutes</span>
+                    </div>
+                    <h2 id="step2-display-title" class="text-xl sm:text-2xl font-bold text-white">Titre de l'histoire</h2>
+                    <p class="text-sm text-zinc-400 mt-1">Choisis le synopsis qui te plaît le plus ou génère 3 nouvelles propositions.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="goToStep(1)" class="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 text-sm font-medium transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Modifier le titre
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loader Synopsis -->
+            <div id="ideas-loader" class="hidden glass-card rounded-2xl p-12 text-center space-y-4">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blood-950/80 border border-blood-700 text-blood-500 animate-pulse">
+                    <i class="fa-solid fa-ghost text-3xl fa-bounce"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Création de 3 concepts d'horreur originaux...</h3>
+                <p class="text-sm text-zinc-400 max-w-md mx-auto">L'IA élabore 3 intrigues angoissantes avec un fort potentiel de rétention et un twist final marquant.</p>
+            </div>
+
+            <!-- Grille des 3 cartes de synopsis -->
+            <div id="ideas-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Généré dynamiquement en JS -->
+            </div>
+
+            <!-- Bouton pour régénérer 3 autres idées -->
+            <div id="ideas-actions" class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <button onclick="generateStoryIdeas(true)" class="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white border border-blood-600/60 hover:border-blood-500 font-semibold py-3.5 px-8 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-dice text-blood-500"></i>
+                    <span>Pas convaincu ? Générer 3 autres idées d'histoires</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             ÉTAPE 3, 4 & 5 : SCRIPT 5S, HOOK & ÉDITION
+             ========================================== -->
+        <section id="section-step-3" class="hidden space-y-8">
+            
+            <!-- Barre de statut et progression de la durée -->
+            <div class="glass-card rounded-2xl p-6 border border-zinc-800 sticky top-20 z-30 shadow-2xl">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <span class="px-2.5 py-0.5 rounded bg-blood-950 text-blood-400 border border-blood-800 text-xs font-mono font-semibold" id="script-header-duration">15 MIN</span>
+                            <span class="px-2.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-xs font-mono" id="script-header-stats">0 / 180 lignes de 5s</span>
+                            <span id="script-status-badge" class="px-2.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 text-xs font-mono">En cours...</span>
+                        </div>
+                        <h2 id="script-header-title" class="text-lg sm:text-xl font-bold text-white truncate max-w-2xl">Titre</h2>
+                    </div>
+
+                    <!-- Boutons d'action globaux -->
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <button id="btn-auto-complete" onclick="generateAllRemainingActs()" class="bg-blood-600 hover:bg-blood-500 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg shadow-blood-900/40">
+                            <i class="fa-solid fa-forward-fast"></i>
+                            <span>Générer tout le script d'un coup</span>
+                        </button>
+                        <button onclick="copyAllText()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Copier tout le texte</span>
+                        </button>
+                        <button onclick="resetApp()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs sm:text-sm font-medium px-3.5 py-2.5 rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>Recommencer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barre de progression temporelle -->
+                <div class="w-full bg-abyss-950 h-3 rounded-full overflow-hidden border border-zinc-800 p-0.5">
+                    <div id="script-progress-bar" class="bg-gradient-to-r from-blood-800 via-blood-600 to-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-[11px] font-mono text-zinc-400 mt-1.5">
+                    <span id="progress-label-left">Progression : 00:00</span>
+                    <span>Pics d'émotion : toutes les 10-15s</span>
+                    <span id="progress-label-right">Cible : 15:00 (Dénouement dans les 20 dernières sec)</span>
+                </div>
+            </div>
+
+            <!-- Loader de génération de script -->
+            <div id="script-loader" class="hidden glass-card rounded-2xl p-8 text-center border border-blood-800/50 space-y-4">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blood-950 text-blood-500 border border-blood-700">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+                </div>
+                <h3 id="script-loader-title" class="text-lg font-bold text-white">Rédaction du script ligne par ligne (5 secondes max)...</h3>
+                <p id="script-loader-sub" class="text-sm text-zinc-400 max-w-xl mx-auto">Intégration des prompts d'images sous chaque ligne, calibrage des pics d'émotions toutes les 10-15 secondes et préparation du suspense.</p>
+            </div>
+
+            <!-- ==========================================
+                 ENCART HOOK D'INTRODUCTION (3 x 5 SECONDES)
+                 ========================================== -->
+            <div id="hook-container" class="glass-card rounded-2xl p-6 border-2 border-amber-600/60 bg-gradient-to-b from-amber-950/20 to-abyss-900 shadow-2xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-amber-800/40">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400">
+                            <i class="fa-solid fa-fire-flame-curved text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">À placer au tout début de la vidéo</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-white mt-0.5">HOOK D'INTRODUCTION EXCEPTIONNEL (3 x 5 Secondes = 15s)</h3>
+                        </div>
+                    </div>
+                    <button onclick="copyHookOnly()" class="self-start sm:self-auto text-xs bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 px-3 py-2 rounded-lg transition flex items-center gap-2 font-medium">
+                        <i class="fa-solid fa-copy"></i> Copier le Hook seul
+                    </button>
+                </div>
+
+                <div id="hook-content" class="mt-4 space-y-4">
+                    <!-- Rempli dynamiquement -->
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 FILTRES D'AFFICHAGE & LISTE DES LIGNES 5S
+                 ========================================== -->
+            <div class="space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-scroll text-blood-500"></i>
+                        <span>Script Complet Découpé (1 ligne = 5s max + Prompt Image)</span>
+                    </h3>
+                    <div class="flex items-center gap-3 text-xs">
+                        <label class="flex items-center gap-2 cursor-pointer bg-zinc-900 border border-zinc-700 px-3 py-1.5 rounded-lg">
+                            <input type="checkbox" id="toggle-prompts" checked onchange="renderScriptLines()" class="accent-blood-600">
+                            <span>Afficher les Prompts Images</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer bg-zinc-900 border border-zinc-700 px-3 py-1.5 rounded-lg">
+                            <input type="checkbox" id="toggle-timestamps" checked onchange="renderScriptLines()" class="accent-blood-600">
+                            <span>Afficher les Timestamps</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Conteneur des lignes de 5 secondes -->
+                <div id="script-lines-container" class="space-y-3">
+                    <!-- Généré dynamiquement -->
+                </div>
+
+                <!-- Bouton pour générer l'acte suivant si pas encore à 100% -->
+                <div id="next-act-box" class="hidden glass-card rounded-2xl p-6 border border-blood-700/60 text-center space-y-4">
+                    <p id="next-act-info" class="text-sm text-zinc-300">Pour garantir que chaque ligne de 5 secondes soit ultra-détaillée sans coupure, le script est généré par actes successifs.</p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button onclick="generateNextAct()" class="bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-600 font-bold py-3 px-6 rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span id="btn-next-act-label">Générer l'Acte Suivant</span>
+                        </button>
+                        <button onclick="generateAllRemainingActs()" class="bg-gradient-to-r from-blood-700 to-blood-600 hover:from-blood-600 hover:to-blood-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-forward-fast"></i>
+                            <span>Générer automatiquement jusqu'à la fin (<span id="target-min-label">15</span> min)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 ÉTAPE 4 : AMÉLIORATION ET MODIFICATIONS
+                 ========================================== -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border border-zinc-700/80 shadow-2xl space-y-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blood-950 border border-blood-700 flex items-center justify-center text-blood-400">
+                        <i class="fa-solid fa-sliders text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white">Améliorer ou Modifier l'histoire selon tes notes</h3>
+                        <p class="text-xs sm:text-sm text-zinc-400">Pas totalement satisfait d'un passage, de l'ambiance ou du twist ? Écris tes consignes ci-dessous et l'IA modifiera le script et les prompts.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <textarea id="improvement-notes" rows="4" 
+                        placeholder="Ex: Rends les bruits dans le grenier beaucoup plus terrifiants, ajoute plus de paranoïa au milieu de l'histoire, et fais en sorte que le dénouement final implique le voisin..."
+                        class="w-full bg-abyss-900 border border-zinc-700 focus:border-blood-500 focus:ring-2 focus:ring-blood-500/20 rounded-xl p-4 text-white placeholder-zinc-500 text-sm outline-none transition"></textarea>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-2 text-xs text-zinc-400">
+                        <i class="fa-solid fa-circle-info text-blood-500"></i>
+                        <span>Conserve la règle stricte des 5 secondes par ligne, les pics d'émotions toutes les 10-15s et les prompts images.</span>
+                    </div>
+                    <button id="btn-improve-script" onclick="improveScript()" class="bg-blood-600 hover:bg-blood-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Améliorer / Modifier l'histoire</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 ÉTAPE 5 : EXPORT TEXTE BRUT & RÉINITIALISATION
+                 ========================================== -->
+            <div class="glass-card rounded-2xl p-6 border border-zinc-800 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Aperçu & Export Texte Complet (Prêt pour téléprompteur / montage)</h3>
+                        <p class="text-xs text-zinc-400">Contient le Hook de 3x5s au début, suivi de chaque ligne de 5s, son prompt d'image et le dénouement final.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="copyAllText()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Copier tout le texte</span>
+                        </button>
+                        <button onclick="resetApp()" class="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-600 font-semibold py-3 px-6 rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-right text-blood-500"></i>
+                            <span>Recommencer pour une autre histoire</span>
+                        </button>
+                    </div>
+                </div>
+                <textarea id="raw-export-textarea" readonly rows="8" class="w-full bg-abyss-950 border border-zinc-800 rounded-xl p-4 font-mono text-xs text-zinc-300 outline-none"></textarea>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION API GEMINI & ÉTAT GLOBAL
+        // ==========================================
+        const apiKey = ""; // Injecté automatiquement par l'environnement Canvas
+        const MODEL_NAME = "gemini-3-flash-preview";
+
+        let appState = {
+            step: 1,
+            title: "",
+            durationMinutes: 15,
+            totalBlocks: 180, // 15 min * 12 blocs de 5s par minute
+            totalActs: 4,
+            currentAct: 0,
+            ideas: [],
+            rejectedIdeasHistory: [],
+            selectedIdea: null,
+            hookLines: [], // 3 blocs de 5s
+            scriptLines: [], // Liste de tous les blocs de 5s
+            isGenerating: false,
+            autoGeneratingAll: false
+        };
+
+        // Initialisation au chargement
+        window.onload = function() {
+            updateDurationMetrics();
+        };
+
+        // Remplir un exemple de titre
+        function fillSampleTitle(sample) {
+            document.getElementById('video-title').value = sample;
+        }
+
+        // Calcul du nombre de lignes de 5 secondes selon la durée choisie
+        function updateDurationMetrics() {
+            const min = parseInt(document.getElementById('video-duration').value, 10);
+            const totalBlocks = min * 12; // 60s / 5s = 12 blocs par minute
+            const emotionPeaks = Math.floor(totalBlocks / 2.5); // Tous les 10-15s (2 à 3 blocs)
+            const twistStartSec = (min * 60) - 20;
+            const twistStartFormatted = formatTime(twistStartSec);
+            const endFormatted = formatTime(min * 60);
+
+            document.getElementById('duration-metrics').innerHTML = `
+                • <span class="text-blood-400 font-bold">${totalBlocks} lignes</span> de 5 secondes max<br>
+                • <span class="text-amber-400 font-bold">~${emotionPeaks} pics</span> d'émotions / suspense (10-15s)<br>
+                • Twist final : <span class="text-emerald-400 font-bold">${twistStartFormatted} à ${endFormatted}</span> (20 dernières sec)
+            `;
+        }
+
+        // Formater des secondes en MM:SS
+        function formatTime(totalSeconds) {
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // Afficher une notification Toast (aucun alert())
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            msg.textContent = message;
+            if (isError) {
+                icon.className = "fa-solid fa-triangle-exclamation text-amber-500";
+            } else {
+                icon.className = "fa-solid fa-circle-check text-emerald-500";
+            }
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        // Navigation entre les étapes
+        function goToStep(stepNumber) {
+            appState.step = stepNumber;
+            document.getElementById('section-step-1').classList.toggle('hidden', stepNumber !== 1);
+            document.getElementById('section-step-2').classList.toggle('hidden', stepNumber !== 2);
+            document.getElementById('section-step-3').classList.toggle('hidden', stepNumber !== 3);
+
+            // Mise à jour visuelle du stepper
+            for (let i = 1; i <= 3; i++) {
+                const ind = document.getElementById(`step-ind-${i}`);
+                const badge = ind.querySelector('span:first-child');
+                if (i === stepNumber) {
+                    ind.className = "flex items-center space-x-2 text-blood-500 font-semibold";
+                    badge.className = "w-6 h-6 rounded-full bg-blood-600 text-white flex items-center justify-center text-xs font-bold";
+                } else if (i < stepNumber) {
+                    ind.className = "flex items-center space-x-2 text-emerald-400";
+                    badge.className = "w-6 h-6 rounded-full bg-emerald-900/80 text-emerald-300 border border-emerald-600 flex items-center justify-center text-xs font-bold";
+                } else {
+                    ind.className = "flex items-center space-x-2 text-zinc-500";
+                    badge.className = "w-6 h-6 rounded-full bg-zinc-800 text-zinc-400 flex items-center justify-center text-xs font-bold";
+                }
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // APPEL API GEMINI AVEC BACKOFF EXPONENTIEL
+        // ==========================================
+        async function callGeminiJSON(systemInstruction, userPrompt, schema) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: schema,
+                    temperature: 0.85
+                }
+            };
+
+            let delay = 1000;
+            for (let attempt = 0; attempt < 5; attempt++) {
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP status ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!text) throw new Error("Réponse vide de l'IA");
+                    return JSON.parse(text);
+                } catch (err) {
+                    if (attempt === 4) throw err;
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // ==========================================
+        // ÉTAPE 1 -> 2 : GÉNÉRER 3 SYNOPSIS D'HISTOIRES
+        // ==========================================
+        async function generateStoryIdeas(isRegeneration = false) {
+            if (appState.isGenerating) return;
+
+            const titleInput = document.getElementById('video-title').value.trim();
+            const durationSelect = parseInt(document.getElementById('video-duration').value, 10);
+
+            if (!titleInput) {
+                showToast("Merci d'entrer un titre de vidéo avant de générer les idées.", true);
+                document.getElementById('video-title').focus();
+                return;
+            }
+
+            appState.title = titleInput;
+            appState.durationMinutes = durationSelect;
+            appState.totalBlocks = durationSelect * 12; // 12 blocs de 5s par minute
+
+            // Nombre d'actes proportionnel à la durée pour garantir la génération complète de tous les blocs
+            if (durationSelect <= 10) appState.totalActs = 3;
+            else if (durationSelect <= 15) appState.totalActs = 4;
+            else if (durationSelect <= 20) appState.totalActs = 5;
+            else appState.totalActs = 6;
+
+            document.getElementById('step2-display-title').textContent = appState.title;
+            document.getElementById('step2-badge-duration').textContent = `${appState.durationMinutes} minutes (${appState.totalBlocks} blocs de 5s)`;
+
+            goToStep(2);
+
+            const loader = document.getElementById('ideas-loader');
+            const grid = document.getElementById('ideas-grid');
+            const actions = document.getElementById('ideas-actions');
+
+            loader.classList.remove('hidden');
+            grid.innerHTML = '';
+            actions.classList.add('hidden');
+            appState.isGenerating = true;
+
+            const previousTitlesNote = appState.rejectedIdeasHistory.length > 0
+                ? `Ne propose surtout pas ces pistes déjà vues : ${appState.rejectedIdeasHistory.join(" | ")}. Propose 3 angles totalement différents et originaux.`
+                : "";
+
+            const systemPrompt = `Tu es un scénariste d'élite spécialisé dans les histoires d'horreur captivantes pour YouTube (narration immersive à la 1ère personne "Je", suspense psychologique, phénomènes inexplicables, terreur nocturne, rebondissements).`;
+
+            const userPrompt = `Titre de la vidéo YouTube : "${appState.title}"
+Durée prévue du script : ${appState.durationMinutes} minutes.
+${previousTitlesNote}
+
+Génère 3 propositions d'histoires d'horreur distinctes dans les grandes lignes, parfaitement adaptées à ce titre et calibrées pour tenir l'auditeur en haleine pendant ${appState.durationMinutes} minutes avec un twist final choc dans les 20 dernières secondes.`;
+
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    ideas: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                shortTitle: { type: "STRING" },
+                                ambiance: { type: "STRING" },
+                                synopsis: { type: "STRING" },
+                                progressionOutline: { type: "STRING" },
+                                finalTwistPreview: { type: "STRING" }
+                            },
+                            propertyOrdering: ["shortTitle", "ambiance", "synopsis", "progressionOutline", "finalTwistPreview"]
+                        }
+                    }
+                },
+                propertyOrdering: ["ideas"]
+            };
+
+            try {
+                const data = await callGeminiJSON(systemPrompt, userPrompt, schema);
+                appState.ideas = data.ideas || [];
+                appState.ideas.forEach(idea => appState.rejectedIdeasHistory.push(idea.shortTitle));
+                renderIdeasCards();
+                if (isRegeneration) {
+                    showToast("3 nouvelles idées d'histoires générées !");
+                }
+            } catch (error) {
+                showToast("Erreur lors de la génération des synopsis. Réessaie.", true);
+            } finally {
+                loader.classList.add('hidden');
+                actions.classList.remove('hidden');
+                appState.isGenerating = false;
+            }
+        }
+
+        function renderIdeasCards() {
+            const grid = document.getElementById('ideas-grid');
+            grid.innerHTML = '';
+
+            appState.ideas.forEach((idea, index) => {
+                const card = document.createElement('div');
+                card.className = "glass-card horror-border rounded-2xl p-6 flex flex-col justify-between transition duration-300";
+                card.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 rounded-full bg-blood-950 text-blood-400 border border-blood-800 text-xs font-mono font-bold">
+                                PROPOSITION #${index + 1}
+                            </span>
+                            <span class="text-xs text-zinc-400 font-mono">${idea.ambiance}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white leading-snug">${idea.shortTitle}</h3>
+                        <div class="space-y-3 text-sm text-zinc-300">
+                            <div>
+                                <span class="text-xs font-mono uppercase text-zinc-500 block mb-0.5">Les grandes lignes :</span>
+                                <p class="leading-relaxed">${idea.synopsis}</p>
+                            </div>
+                            <div class="bg-abyss-900/80 p-3 rounded-xl border border-zinc-800/80">
+                                <span class="text-xs font-mono uppercase text-amber-400 block mb-0.5"><i class="fa-solid fa-wave-square mr-1"></i> Évolution & Suspense :</span>
+                                <p class="text-xs text-zinc-300 leading-relaxed">${idea.progressionOutline}</p>
+                            </div>
+                            <div class="bg-blood-950/30 p-3 rounded-xl border border-blood-900/50">
+                                <span class="text-xs font-mono uppercase text-blood-400 block mb-0.5"><i class="fa-solid fa-bolt mr-1"></i> Dénouement (20 dernières sec) :</span>
+                                <p class="text-xs text-zinc-300 leading-relaxed">${idea.finalTwistPreview}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="selectIdea(${index})" class="mt-6 w-full bg-blood-600 hover:bg-blood-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Choisir cette histoire</span>
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ==========================================
+        // ÉTAPE 2 -> 3 : LANCER LA GÉNÉRATION DU SCRIPT 5S & HOOK
+        // ==========================================
+        async function selectIdea(index) {
+            appState.selectedIdea = appState.ideas[index];
+            appState.currentAct = 0;
+            appState.scriptLines = [];
+            appState.hookLines = [];
+            appState.autoGeneratingAll = false;
+
+            document.getElementById('script-header-title').textContent = `${appState.title} — (${appState.selectedIdea.shortTitle})`;
+            document.getElementById('script-header-duration').textContent = `${appState.durationMinutes} MINUTES`;
+            document.getElementById('target-min-label').textContent = appState.durationMinutes;
+
+            goToStep(3);
+            updateProgressUI();
+
+            // Générer le Hook exceptionnel (3x5s) + le Premier Acte immédiatement
+            await generateNextAct(true);
+        }
+
+        // Générer un acte du script (et le Hook 3x5s lors du premier appel)
+        async function generateNextAct(includeHook = false) {
+            if (appState.isGenerating) return;
+            if (appState.currentAct >= appState.totalActs) return;
+
+            appState.isGenerating = true;
+            const nextActNumber = appState.currentAct + 1;
+            const isFinalAct = (nextActNumber === appState.totalActs);
+
+            // Calcul du nombre exact de blocs de 5 secondes pour cet acte
+            const blocksPerActBase = Math.floor(appState.totalBlocks / appState.totalActs);
+            const blocksTargetForThisAct = isFinalAct 
+                ? (appState.totalBlocks - appState.scriptLines.length) 
+                : blocksPerActBase;
+
+            const startBlockIndex = appState.scriptLines.length;
+            const endBlockIndex = startBlockIndex + blocksTargetForThisAct;
+
+            const loader = document.getElementById('script-loader');
+            const loaderTitle = document.getElementById('script-loader-title');
+            const loaderSub = document.getElementById('script-loader-sub');
+            const nextActBox = document.getElementById('next-act-box');
+
+            loader.classList.remove('hidden');
+            nextActBox.classList.add('hidden');
+
+            const startTimeStr = formatTime(startBlockIndex * 5);
+            const endTimeStr = formatTime(endBlockIndex * 5);
+
+            loaderTitle.textContent = `Rédaction de l'Acte ${nextActNumber}/${appState.totalActs} (${startTimeStr} à ${endTimeStr})...`;
+            loaderSub.textContent = `Création de ${blocksTargetForThisAct} lignes de 5 secondes max + ${blocksTargetForThisAct} prompts d'images + pics d'émotions toutes les 10-15 secondes${isFinalAct ? ' + Twist final dans les 20 dernières secondes + Hook de 3x5s' : ''}.`;
+
+            const lastLinesContext = appState.scriptLines.slice(-6).map(l => l.narration).join(" ");
+
+            const systemPrompt = `Tu es un maître du storytelling d'horreur sur YouTube.
+RÈGLES ABSOLUES ET NON NÉGOCIABLES :
+1. RÈGLE DES 5 SECONDES : Tu écris le script ligne par ligne. Chaque ligne ("narration") ne doit JAMAIS dépasser 5 secondes à l'oral (strictement entre 10 et 15 mots maximum par ligne, phrases percutantes à la 1ère personne "Je").
+2. PROMPT IMAGE SOUS CHAQUE LIGNE : Pour CHAQUE ligne de 5 secondes, fournis un "imagePrompt" ultra-détaillé, cinématographique, sombre et terrifiant qui illustre exactement la ligne.
+3. PICS D'ÉMOTION TOUTES LES 10 À 15 SECONDES : Toutes les 2 ou 3 lignes (soit toutes les 10 à 15 secondes), crée un pic d'émotion, de peur, un bruit soudain, un détail glaçant ou un suspense intense. Renseigne le champ "emotionPeak" sur ces lignes (ex: "PIC DE SUSPENSE : Bruit de grattement derrière la cloison", "PIC D'ANGOISSE : Respiration coupée"). Laisse une chaîne vide "" sur les lignes de transition normales.
+4. DÉNOUEMENT DANS LES 20 DERNIÈRES SECONDES : Si c'est le dernier acte, le dénouement final choc (twist) doit impérativement se produire dans les 4 DERNIÈRES LIGNES de 5 secondes (les 20 dernières secondes de l'histoire).`;
+
+            const userPrompt = `Titre de la vidéo : "${appState.title}"
+Durée totale choisie : ${appState.durationMinutes} minutes (${appState.totalBlocks} lignes de 5s au total).
+Synopsis choisi : ${appState.selectedIdea.synopsis}
+Progression prévue : ${appState.selectedIdea.progressionOutline}
+Dénouement final prévu : ${appState.selectedIdea.finalTwistPreview}
+
+Nous générons actuellement l'ACTE ${nextActNumber} sur ${appState.totalActs} (couvrant le segment temporel ${startTimeStr} à ${endTimeStr}).
+${lastLinesContext ? `Dernières lignes de l'acte précédent pour assurer une continuité fluide sans répétition : "${lastLinesContext}"` : `C'est le début de l'histoire (00:00). Plonge immédiatement dans l'ambiance sans dire "Bonjour à tous".`}
+
+CONSIGNES POUR CET APPEL :
+- Génère exactement ${blocksTargetForThisAct} lignes de 5 secondes pour cet acte.
+- Toutes les 2 à 3 lignes (10-15 secondes), intègre un pic d'émotion/suspense fort.
+${isFinalAct ? `- ATTENTION : C'est l'Acte Final ! Les 4 dernières lignes de 5 secondes (les 20 dernières secondes) DOIVENT contenir le dénouement final choc (twist) : "${appState.selectedIdea.finalTwistPreview}". Marque "isFinalTwist": true sur ces 4 dernières lignes.` : `- Ne révèle PAS encore le dénouement final, fais monter la tension progressivement.`}
+${includeHook ? `- Génère également "hookLines" : un deuxième mini-script de EXACTEMENT 3 lignes de 5 secondes (avec leurs 3 prompts d'images) conçu pour être mis tout au début de la vidéo. Ce Hook doit être EXCEPTIONNEL, un hook de fou qui capte viscéralement l'attention des auditeurs et leur donne une envie irrésistible de regarder l'histoire, SANS JAMAIS spoiler le dénouement.` : ''}`;
+
+            const schemaProperties = {
+                lines: {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            narration: { type: "STRING" },
+                            imagePrompt: { type: "STRING" },
+                            emotionPeak: { type: "STRING" },
+                            isFinalTwist: { type: "BOOLEAN" }
+                        },
+                        propertyOrdering: ["narration", "imagePrompt", "emotionPeak", "isFinalTwist"]
+                    }
+                }
+            };
+
+            const ordering = ["lines"];
+
+            if (includeHook) {
+                schemaProperties.hookLines = {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            narration: { type: "STRING" },
+                            imagePrompt: { type: "STRING" }
+                        },
+                        propertyOrdering: ["narration", "imagePrompt"]
+                    }
+                };
+                ordering.push("hookLines");
+            }
+
+            const schema = {
+                type: "OBJECT",
+                properties: schemaProperties,
+                propertyOrdering: ordering
+            };
+
+            try {
+                const data = await callGeminiJSON(systemPrompt, userPrompt, schema);
+
+                if (includeHook && data.hookLines && data.hookLines.length > 0) {
+                    appState.hookLines = data.hookLines.slice(0, 3);
+                }
+
+                if (data.lines && data.lines.length > 0) {
+                    data.lines.forEach(line => {
+                        appState.scriptLines.push({
+                            act: nextActNumber,
+                            narration: line.narration,
+                            imagePrompt: line.imagePrompt,
+                            emotionPeak: line.emotionPeak || "",
+                            isFinalTwist: Boolean(line.isFinalTwist)
+                        });
+                    });
+                }
+
+                appState.currentAct = nextActNumber;
+                renderHookSection();
+                renderScriptLines();
+                updateProgressUI();
+                updateRawExport();
+
+                showToast(`Acte ${nextActNumber}/${appState.totalActs} généré avec succès !`);
+            } catch (error) {
+                showToast("Erreur pendant la génération de l'acte. Tu peux relancer.", true);
+                appState.autoGeneratingAll = false;
+            } finally {
+                loader.classList.add('hidden');
+                appState.isGenerating = false;
+                updateProgressUI();
+            }
+        }
+
+        // Générer automatiquement tous les actes restants pour atteindre la durée complète
+        async function generateAllRemainingActs() {
+            if (appState.isGenerating) return;
+            appState.autoGeneratingAll = true;
+            while (appState.currentAct < appState.totalActs && appState.autoGeneratingAll) {
+                await generateNextAct(appState.hookLines.length === 0);
+            }
+            appState.autoGeneratingAll = false;
+            showToast(`Script complet de ${appState.durationMinutes} minutes terminé !`);
+        }
+
+        // ==========================================
+        // ÉTAPE 4 : AMÉLIORER / MODIFIER LE SCRIPT SELON LES NOTES
+        // ==========================================
+        async function improveScript() {
+            if (appState.isGenerating) return;
+            const notes = document.getElementById('improvement-notes').value.trim();
+            if (!notes) {
+                showToast("Écris tes consignes dans la case avant de cliquer sur Améliorer.", true);
+                document.getElementById('improvement-notes').focus();
+                return;
+            }
+
+            appState.isGenerating = true;
+            const loader = document.getElementById('script-loader');
+            const loaderTitle = document.getElementById('script-loader-title');
+            const loaderSub = document.getElementById('script-loader-sub');
+
+            loader.classList.remove('hidden');
+            loaderTitle.textContent = "Modification et amélioration du script selon tes notes...";
+            loaderSub.textContent = `Application de la consigne : "${notes}" tout en respectant les lignes de 5 secondes, les prompts images et les pics toutes les 10-15s.`;
+
+            window.scrollTo({ top: 150, behavior: 'smooth' });
+
+            // Pour permettre une modification rapide et fidèle même sur un script très long,
+            // on envoie le script actuel (ou les segments concernés) et on réécrit selon les notes
+            const currentScriptSummary = appState.scriptLines.map((l, idx) => `[Ligne ${idx + 1}] ${l.narration}`).join("\n");
+            const targetCount = appState.scriptLines.length || 36;
+
+            const systemPrompt = `Tu es un script-doctor spécialisé dans les chaînes YouTube d'horreur.
+Tu dois modifier et améliorer le script existant en suivant STRICTEMENT les notes de l'utilisateur.
+Règles obligatoires à conserver :
+- Chaque ligne fait MAXIMUM 5 secondes à l'oral (10 à 15 mots max).
+- Sous chaque ligne de 5 secondes, fournis un prompt d'image détaillé ("imagePrompt").
+- Toutes les 2 à 3 lignes (10 à 15 secondes), intègre un pic d'émotion ou de suspense ("emotionPeak").
+- Le dénouement final choc a lieu dans les 4 dernières lignes (20 dernières secondes).
+- Mets aussi à jour le Hook d'introduction de 3 x 5 secondes ("hookLines") pour qu'il soit encore plus percutant.`;
+
+            const userPrompt = `Titre : "${appState.title}"
+Synopsis : ${appState.selectedIdea.synopsis}
+NOTES DE MODIFICATION DE L'UTILISATEUR À APPLIQUER IMPÉRATIVEMENT :
+"${notes}"
+
+Script actuel (${targetCount} lignes de 5s) :
+${currentScriptSummary}
+
+Réécris et améliore le script (${targetCount} lignes de 5 secondes + leurs prompts d'images) ainsi que les 3 lignes de 5 secondes du Hook en intégrant parfaitement les demandes de l'utilisateur.`;
+
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    hookLines: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                narration: { type: "STRING" },
+                                imagePrompt: { type: "STRING" }
+                            },
+                            propertyOrdering: ["narration", "imagePrompt"]
+                        }
+                    },
+                    lines: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                narration: { type: "STRING" },
+                                imagePrompt: { type: "STRING" },
+                                emotionPeak: { type: "STRING" },
+                                isFinalTwist: { type: "BOOLEAN" }
+                            },
+                            propertyOrdering: ["narration", "imagePrompt", "emotionPeak", "isFinalTwist"]
+                        }
+                    }
+                },
+                propertyOrdering: ["hookLines", "lines"]
+            };
+
+            try {
+                const data = await callGeminiJSON(systemPrompt, userPrompt, schema);
+                if (data.hookLines && data.hookLines.length > 0) {
+                    appState.hookLines = data.hookLines.slice(0, 3);
+                }
+                if (data.lines && data.lines.length > 0) {
+                    appState.scriptLines = data.lines.map((l, idx) => ({
+                        act: Math.min(appState.totalActs, Math.floor(idx / (data.lines.length / appState.totalActs)) + 1),
+                        narration: l.narration,
+                        imagePrompt: l.imagePrompt,
+                        emotionPeak: l.emotionPeak || "",
+                        isFinalTwist: Boolean(l.isFinalTwist)
+                    }));
+                }
+
+                renderHookSection();
+                renderScriptLines();
+                updateProgressUI();
+                updateRawExport();
+                showToast("Le script et les prompts ont été améliorés selon tes notes !");
+            } catch (error) {
+                showToast("Erreur lors de la modification du script. Réessaie.", true);
+            } finally {
+                loader.classList.add('hidden');
+                appState.isGenerating = false;
+            }
+        }
+
+        // ==========================================
+        // RENDU INTERFACE : HOOK (3 x 5 SECONDES)
+        // ==========================================
+        function renderHookSection() {
+            const container = document.getElementById('hook-content');
+            container.innerHTML = '';
+
+            if (!appState.hookLines || appState.hookLines.length === 0) {
+                container.innerHTML = `<p class="text-sm text-zinc-500 italic">Le Hook de 3x5 secondes sera affiché ici dès la fin de la génération...</p>`;
+                return;
+            }
+
+            appState.hookLines.forEach((item, idx) => {
+                const tStart = formatTime(idx * 5);
+                const tEnd = formatTime((idx + 1) * 5);
+                const block = document.createElement('div');
+                block.className = "bg-abyss-950/90 border border-amber-500/30 rounded-xl p-4 space-y-2.5";
+                block.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-bold text-amber-400 bg-amber-950/60 px-2.5 py-0.5 rounded border border-amber-700/50">
+                            HOOK LIGNE ${idx + 1}/3 [${tStart} - ${tEnd}] (5s)
+                        </span>
+                        <button onclick="copySingleText('${escapeForAttr(item.imagePrompt)}', 'Prompt image du Hook copié !')" 
+                            class="text-xs text-zinc-400 hover:text-amber-300 transition flex items-center gap-1">
+                            <i class="fa-solid fa-image"></i> Copier Prompt
+                        </button>
+                    </div>
+                    <p class="text-base sm:text-lg font-bold text-white leading-snug">
+                        « ${item.narration} »
+                    </p>
+                    <div class="bg-zinc-900/90 border border-zinc-800 rounded-lg p-3 text-xs text-zinc-300 font-mono flex items-start gap-2">
+                        <i class="fa-solid fa-camera text-amber-400 mt-0.5"></i>
+                        <div><strong class="text-amber-400">[Prompt Image ${idx + 1}] :</strong> ${item.imagePrompt}</div>
+                    </div>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        // ==========================================
+        // RENDU INTERFACE : LIGNES DE 5 SECONDES + PROMPTS
+        // ==========================================
+        function renderScriptLines() {
+            const container = document.getElementById('script-lines-container');
+            const showPrompts = document.getElementById('toggle-prompts').checked;
+            const showTimestamps = document.getElementById('toggle-timestamps').checked;
+
+            container.innerHTML = '';
+
+            const totalGenerated = appState.scriptLines.length;
+
+            appState.scriptLines.forEach((line, index) => {
+                const startSec = index * 5;
+                const endSec = (index + 1) * 5;
+                const timeBadge = `[${formatTime(startSec)} - ${formatTime(endSec)}]`;
+
+                // Détection des 4 derniers blocs du script complet (20 dernières secondes = dénouement final)
+                const isLast20Seconds = (appState.currentAct === appState.totalActs && index >= totalGenerated - 4) || line.isFinalTwist;
+                // Détection pic d'émotion (toutes les 10-15s)
+                const hasEmotionPeak = Boolean(line.emotionPeak && line.emotionPeak.trim() !== "");
+
+                let borderStyle = "border-zinc-800/90";
+                let bgStyle = "bg-abyss-900/80";
+
+                if (isLast20Seconds) {
+                    borderStyle = "border-blood-500 border-2";
+                    bgStyle = "bg-gradient-to-r from-blood-950/60 to-abyss-900";
+                } else if (hasEmotionPeak) {
+                    borderStyle = "border-amber-600/50";
+                    bgStyle = "bg-abyss-900/95";
+                }
+
+                const item = document.createElement('div');
+                item.className = `${bgStyle} border ${borderStyle} rounded-xl p-4 transition hover:border-zinc-600 space-y-2.5`;
+
+                let badgesHTML = '';
+                if (showTimestamps) {
+                    badgesHTML += `<span class="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">${timeBadge} (5s)</span>`;
+                }
+                if (hasEmotionPeak) {
+                    badgesHTML += `
+                        <span class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-700/60 flex items-center gap-1.5">
+                            <i class="fa-solid fa-heart-pulse text-amber-400"></i> ${line.emotionPeak}
+                        </span>
+                    `;
+                }
+                if (isLast20Seconds) {
+                    badgesHTML += `
+                        <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-blood-600 text-white flex items-center gap-1.5">
+                            <i class="fa-solid fa-skull-crossbones"></i> DÉNOUEMENT FINAL (20 DERNIÈRES SEC)
+                        </span>
+                    `;
+                }
+
+                item.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs font-mono text-zinc-500">#${index + 1}</span>
+                            ${badgesHTML}
+                        </div>
+                        <button onclick="copySingleText('${escapeForAttr(line.imagePrompt)}', 'Prompt image #${index + 1} copié !')" 
+                            class="text-xs text-zinc-400 hover:text-white bg-zinc-800/70 hover:bg-zinc-700 px-2.5 py-1 rounded transition flex items-center gap-1">
+                            <i class="fa-solid fa-copy text-blood-400"></i> Prompt
+                        </button>
+                    </div>
+
+                    <p class="text-base sm:text-lg text-zinc-100 font-medium leading-relaxed">
+                        ${line.narration}
+                    </p>
+
+                    ${showPrompts ? `
+                    <div class="bg-abyss-950 border border-zinc-800/90 rounded-lg p-3 text-xs font-mono text-zinc-400 flex items-start gap-2.5">
+                        <i class="fa-solid fa-wand-magic-sparkles text-blood-500 mt-0.5"></i>
+                        <div><strong class="text-zinc-300">[Prompt Image] :</strong> ${line.imagePrompt}</div>
+                    </div>
+                    ` : ''}
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        // Mise à jour de la barre de progression et des boutons d'actes
+        function updateProgressUI() {
+            const currentLines = appState.scriptLines.length;
+            const currentSeconds = currentLines * 5;
+            const targetSeconds = appState.durationMinutes * 60;
+            const percent = Math.min(100, Math.round((appState.currentAct / appState.totalActs) * 100));
+
+            document.getElementById('script-progress-bar').style.width = `${percent}%`;
+            document.getElementById('script-header-stats').textContent = `${currentLines} lignes de 5s générées (${formatTime(currentSeconds)})`;
+            document.getElementById('progress-label-left').textContent = `Acte ${appState.currentAct}/${appState.totalActs} (${percent}%)`;
+            document.getElementById('progress-label-right').textContent = `Cible : ${appState.durationMinutes}:00 (Twist dans les 20 dernières sec)`;
+
+            const statusBadge = document.getElementById('script-status-badge');
+            const nextActBox = document.getElementById('next-act-box');
+            const btnAutoComplete = document.getElementById('btn-auto-complete');
+
+            if (appState.currentAct >= appState.totalActs) {
+                statusBadge.textContent = "Script Complet + Hook 3x5s";
+                statusBadge.className = "px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-mono";
+                nextActBox.classList.add('hidden');
+                btnAutoComplete.classList.add('hidden');
+            } else {
+                statusBadge.textContent = `Acte ${appState.currentAct}/${appState.totalActs}`;
+                statusBadge.className = "px-2.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 text-xs font-mono";
+                if (!appState.isGenerating) {
+                    nextActBox.classList.remove('hidden');
+                }
+                btnAutoComplete.classList.remove('hidden');
+                document.getElementById('btn-next-act-label').textContent = `Générer l'Acte ${appState.currentAct + 1}/${appState.totalActs}`;
+            }
+        }
+
+        // Construire le texte complet prêt à copier-coller
+        function updateRawExport() {
+            let out = `====================================================\n`;
+            out += `TITRE : ${appState.title}\n`;
+            out += `DURÉE CIBLE : ${appState.durationMinutes} minutes\n`;
+            out += `====================================================\n\n`;
+
+            out += `--- DÉBUT DU SCRIPT PRINCIPAL (1 LIGNE = 5 SECONDES MAX) ---\n\n`;
+
+            appState.scriptLines.forEach((line, idx) => {
+                const tStart = formatTime(idx * 5);
+                const tEnd = formatTime((idx + 1) * 5);
+                if (line.emotionPeak) {
+                    out += `>>> [PIC D'ÉMOTION / SUSPENSE : ${line.emotionPeak}] <<<\n`;
+                }
+                if (line.isFinalTwist) {
+                    out += `>>> [DÉNOUEMENT FINAL - 20 DERNIÈRES SECONDES] <<<\n`;
+                }
+                out += `[${tStart} - ${tEnd}] ${line.narration}\n`;
+                out += `[Prompt Image] : ${line.imagePrompt}\n\n`;
+            });
+
+            out += `====================================================\n`;
+            out += `HOOK D'INTRODUCTION EXCEPTIONNEL (3 x 5 SECONDES = 15s)\n`;
+            out += `(À placer tout au début de la vidéo pour retenir les auditeurs)\n`;
+            out += `====================================================\n\n`;
+
+            appState.hookLines.forEach((h, idx) => {
+                const tStart = formatTime(idx * 5);
+                const tEnd = formatTime((idx + 1) * 5);
+                out += `[HOOK ${tStart} - ${tEnd}] ${h.narration}\n`;
+                out += `[Prompt Image Hook] : ${h.imagePrompt}\n\n`;
+            });
+
+            document.getElementById('raw-export-textarea').value = out;
+        }
+
+        // Utilitaires de copie dans le presse-papier compatibles iframe
+        function escapeForAttr(str) {
+            if (!str) return "";
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+        }
+
+        function copySingleText(text, successMsg) {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast(successMsg || "Copié dans le presse-papier !");
+        }
+
+        function copyHookOnly() {
+            if (!appState.hookLines || appState.hookLines.length === 0) return;
+            let text = `=== HOOK D'INTRODUCTION (3 x 5 SECONDES) ===\n\n`;
+            appState.hookLines.forEach((h, idx) => {
+                text += `[00:0${idx * 5} - 00:${String((idx + 1) * 5).padStart(2, '0')}] ${h.narration}\n`;
+                text += `[Prompt Image] : ${h.imagePrompt}\n\n`;
+            });
+            copySingleText(text, "Hook (3x5s + Prompts) copié !");
+        }
+
+        function copyAllText() {
+            updateRawExport();
+            const textarea = document.getElementById('raw-export-textarea');
+            textarea.select();
+            document.execCommand('copy');
+            showToast("Tout le script, les prompts et le Hook ont été copiés !");
+        }
+
+        // Réinitialiser l'application pour une nouvelle histoire
+        function resetApp() {
+            appState = {
+                step: 1,
+                title: "",
+                durationMinutes: parseInt(document.getElementById('video-duration').value, 10) || 15,
+                totalBlocks: 180,
+                totalActs: 4,
+                currentAct: 0,
+                ideas: [],
+                rejectedIdeasHistory: [],
+                selectedIdea: null,
+                hookLines: [],
+                scriptLines: [],
+                isGenerating: false,
+                autoGeneratingAll: false
+            };
+            document.getElementById('video-title').value = "";
+            document.getElementById('improvement-notes').value = "";
+            document.getElementById('script-lines-container').innerHTML = "";
+            document.getElementById('hook-content').innerHTML = "";
+            document.getElementById('raw-export-textarea').value = "";
+            updateDurationMetrics();
+            goToStep(1);
+            showToast("Prêt pour une nouvelle histoire d'horreur !");
+        }
+    </script>
+</body>
+</html>
